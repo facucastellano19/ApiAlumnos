@@ -10,7 +10,8 @@ usuarioRouter.use(express.json())
 usuarioRouter.post('/login', login)
 
 usuarioRouter.post('/register', 
-    checkRole(1), 
+    //Agregar luego de crear el primer usuario administrador
+    //checkRole(1), 
     validatorHandler(postUsuarioSchema, 'body'),
     register)
 

@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # Servicio de la Base de Datos MySQL
+  db:
+    image: mysql:8.0
+    container_name: mysql_db_alumnos
+    restart: always
+    command: --default-authentication-plugin=mysql_native_password
+    env_file: ./.env # Carga las variables desde el archivo .env
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    ports:
+      # Mapea el puerto 3306 del contenedor al 3307 de tu máquina local
+      # para no entrar en conflicto si ya tienes un MySQL local en el 3306.
+      - "3307:3306" # Puedes cambiar 3307 si lo necesitas
+    volumes:
+      # Monta el script de inicialización para que se ejecute al crear la DB por primera vez
+      - ./db_init.sql:/docker-entrypoint-initdb.d/init.sql
+      # Persiste los datos de la base de datos en un volumen nombrado
+      - db_data:/var/lib/mysql
+
+  # Servicio de la API Node.js
+  api:
+    build: . # Construye la imagen usando el Dockerfile en el directorio actual
+    container_name: gestion_alumnos_api
+    restart: always
+    env_file: ./.env # Carga las variables desde el archivo .env
+    ports:
+      - "${PORT}:${PORT}"
+    environment:
+      PORT: ${PORT}
+      DB_HOST: db # El nombre del servicio de la base de datos
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_DATABASE: ${DB_DATABASE}
+      JWT_SECRET: ${JWT_SECRET}
+    depends_on:
+      db:
+        condition: service_healthy # Espera a que la DB esté saludable antes de iniciar la API
+
+volumes:
+  db_data: # Define el volumen nombrado para persistir los datos de MySQL

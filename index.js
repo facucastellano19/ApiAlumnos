@@ -22,7 +22,7 @@ app.use(logError);
 app.use(errorHandler);
 
 
-const PUERTO = process.env.PUERTO || 3001;
-app.listen(PUERTO, () => {
-  console.log(`Servidor escuchando en el puerto ${PUERTO}`);
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`Servidor escuchando en el puerto ${PORT}`);
 });
