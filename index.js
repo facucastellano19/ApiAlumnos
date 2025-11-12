@@ -2,11 +2,13 @@ const express = require('express');
 const alumnoRouter = require('./src/routers/alumnoRouter');
 const usuarioRouter = require('./src/routers/usuarioRouter')
 const materiaRouter = require('./src/routers/materiaRouter');
+const cors = require('cors'); // 1. Importar cors
 const inscripcionRouter = require('./src/routers/inscripcionRouter');
 const { errorHandler, logError } = require('./src/middlewares/error.handler');
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 
 app.use('/api/alumnos', alumnoRouter);
 app.use('/api/usuario', usuarioRouter);
