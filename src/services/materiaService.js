@@ -151,20 +151,21 @@ class MateriaService {
         };
     }
 
-    async getMateriaAlumnos(id) {
+async getMateriaAlumnos(id) {
 
         const connection = await getConnection();
 
         const query = `
             SELECT
-            u.user_id AS alumno_id,
-            m.materia_id,
-            m.materia_nombre
+              u.user_id AS alumno_id,
+              u.user_nombre AS alumno_nombre,  /* <-- ¡ESTA ES LA LÍNEA QUE FALTABA! */
+              m.materia_id,
+              m.materia_nombre
             FROM materias m
             INNER JOIN inscripciones i ON i.insc_materia_id = m.materia_id AND i.insc_fecha_baja IS NULL
             INNER JOIN usuarios u ON u.user_id = i.insc_alumno_id AND u.user_rol_id = 3 AND u.user_fecha_baja IS NULL
             WHERE m.materia_id = ?
-    `;
+        `;
         const result = await connection.query(query, [id]);
 
         if (result.length === 0) {
