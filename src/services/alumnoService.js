@@ -86,7 +86,7 @@ class AlumnoService {
     };
   }
 
-async putAlumno(id, data) {
+  async putAlumno(id, data) {
     const connection = await getConnection();
 
     const resultados = await connection.query(
@@ -161,7 +161,7 @@ async putAlumno(id, data) {
       usuario,
       usuario_modificacion,
       rol: 3,
-      token: newToken 
+      token: newToken
     };
   }
 
@@ -208,17 +208,19 @@ async putAlumno(id, data) {
         u.user_id AS alumno_id, 
         m.materia_id, 
         m.materia_nombre,
-        i.insc_id as id_inscripcion
+        i.insc_id as id_inscripcion,
+        c.carrera_nombre /* <-- CAMBIO AÑADIDO */
       FROM usuarios u
       LEFT JOIN inscripciones i ON i.insc_alumno_id = u.user_id AND i.insc_fecha_baja IS NULL
       LEFT JOIN materias m ON m.materia_id = i.insc_materia_id
+      LEFT JOIN carreras c ON m.materia_carrera_id = c.carrera_id /* <-- CAMBIO AÑADIDO */
       WHERE u.user_id = ? 
         AND u.user_rol_id = 3 
         AND u.user_fecha_baja IS NULL
     `;
     const result = await connection.query(query, [id]);
 
-    if (result.length === 0) {
+    if (result.length === 0 || result[0].materia_id === null) {
       const error = new Error('El alumno no tiene materias inscriptas');
       error.status = 404;
       throw error;
@@ -226,6 +228,7 @@ async putAlumno(id, data) {
 
     return result
   }
+
 
 }
 
