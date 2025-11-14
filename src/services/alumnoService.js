@@ -1,5 +1,6 @@
 const getConnection = require('../db/mysql');
 const bcrypt = require('bcrypt');
+const { sign } = require('../utils/jwt');
 
 class AlumnoService {
   async getAlumnos() {
@@ -85,7 +86,7 @@ class AlumnoService {
     };
   }
 
-  async putAlumno(id, data) {
+async putAlumno(id, data) {
     const connection = await getConnection();
 
     const resultados = await connection.query(
@@ -145,13 +146,22 @@ class AlumnoService {
       throw error;
     }
 
+    const newPayload = {
+      user_id: alumnoActual.user_id,
+      user_nombre: nombre,
+      user_rol_id: alumnoActual.user_rol_id
+    };
+
+    const newToken = sign(newPayload);
+
     return {
       id,
       nombre,
       email,
       usuario,
       usuario_modificacion,
-      rol: 3
+      rol: 3,
+      token: newToken 
     };
   }
 

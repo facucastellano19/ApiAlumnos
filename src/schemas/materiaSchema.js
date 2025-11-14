@@ -25,6 +25,8 @@ const postMateriaSchema = Joi.object({
         .messages({
             'string.base': 'El nombre debe ser texto',
             'string.empty': 'El nombre es obligatorio',
+            'string.min': 'El nombre debe tener al menos {#limit} caracteres',
+            'string.max': 'El nombre no puede tener más de {#limit} caracteres'
         }),
     carrera_id: Joi.number().integer().min(1).required()
         .messages({
